@@ -9,8 +9,8 @@ const YOUTUBE_API_KEY = process.env.REACT_APP_YT_API_KEY;
 // Fetches the 41 most popular videos in India; regionCode=IN keeps results locally relevant
 export const YOUTUBE_URL = `https://youtube.googleapis.com/youtube/v3/videos?part=snippet%2CcontentDetails%2Cstatistics&chart=mostPopular&regionCode=IN&maxResults=41&key=${YOUTUBE_API_KEY}`;
 
-// client=firefox returns a plain JSON array; the YouTube-specific ds=yt scope narrows results to video titles
-export const SEARCH_SUGGESTIONS = "http://suggestqueries.google.com/complete/search?client=firefox&ds=yt&q=";
+// Suggestions are proxied through our own /api/suggest to bypass Google Suggest's CORS + http (mixed-content) blocks on the deployed site.
+export const SEARCH_SUGGESTIONS = "/api/suggest?q=";
 
 export const LIVE_CHAT_MESSAGES_SPLICE = 20;
 

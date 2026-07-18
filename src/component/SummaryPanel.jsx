@@ -1,26 +1,29 @@
 import { useState } from "react";
+import { useTranscript } from "../utils/useTranscript";
 
 // Drop this on the watch page:  <SummaryPanel videoId={videoId} />
 export default function SummaryPanel({ videoId }) {
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const getSegments = useTranscript();
 
   async function summarize() {
     setLoading(true);
     setError("");
     setData(null);
     try {
+      const segments = await getSegments(videoId);
       const res = await fetch("/api/summarize", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ videoId }),
+        body: JSON.stringify({ videoId, segments }),
       });
       const json = await res.json();
       if (!res.ok || json.error) setError(json.error || "Failed to summarize this video.");
       else setData(json);
-    } catch {
-      setError("Couldn't reach the AI service. Make sure the app is running via `vercel dev`.");
+    } catch (e) {
+      setError(e.message || "Couldn't reach the AI service.");
     }
     setLoading(false);
   }

@@ -8,7 +8,7 @@ export default async function handler(req, res) {
   if (!videoId) return res.status(400).json({ error: "videoId required" });
 
   try {
-    const segments = await fetchTranscript(videoId);
+    const segments = Array.isArray(req.body?.segments) && req.body.segments.length ? req.body.segments : await fetchTranscript(videoId);
     const transcript = segments.map((s) => s.text).join(" ").slice(0, 100000);
 
     if (!process.env.OPENAI_API_KEY) {

@@ -1,26 +1,29 @@
 import { useState } from "react";
+import { useTranscript } from "../utils/useTranscript";
 
 // Left column, under the Summary: <NotesPanel videoId={videoId} />
 export default function NotesPanel({ videoId }) {
   const [notes, setNotes] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const getSegments = useTranscript();
 
   async function generate() {
     setLoading(true);
     setError("");
     setNotes("");
     try {
+      const segments = await getSegments(videoId);
       const res = await fetch("/api/notes", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ videoId }),
+        body: JSON.stringify({ videoId, segments }),
       });
       const json = await res.json();
       if (!res.ok || json.error) setError(json.error || "Couldn't generate notes for this video.");
       else setNotes(json.notes || "");
-    } catch {
-      setError("Couldn't reach the AI service.");
+    } catch (e) {
+      setError(e.message || "Couldn't reach the AI service.");
     }
     setLoading(false);
   }

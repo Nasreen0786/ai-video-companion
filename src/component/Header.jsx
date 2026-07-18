@@ -1,7 +1,7 @@
 import { useDispatch, useSelector } from "react-redux";
 import { SEARCH_SUGGESTIONS, SIDE_MENU_BAR, USER_ICON, YOUTUBE_LOGO } from "../utils/constant";
 import { toggleEvent } from "../utils/appSlice";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useEffect, useRef, useState } from "react";
 import { searchSliceEvent } from "../utils/searchSlice";
 
@@ -12,6 +12,7 @@ const Header = () => {
     // ref used to detect clicks outside the search box and close the dropdown
     const searchRef = useRef(null);
     const dispatch = useDispatch();
+    const navigate = useNavigate();
 
     const HandleSideBarMenu = () => {
         dispatch(toggleEvent());
@@ -20,8 +21,7 @@ const Header = () => {
     // Read the entire search cache from Redux so we can check it synchronously before fetching
     const cache = useSelector((store) => store.search);
 
-    // Debounce the API call by 200 ms. If the query is already cached, skip the network request.
-    // The cleanup function cancels the pending timer whenever the query changes mid-typing.
+    // Debounce the suggestion API call by 200 ms; skip the network if the query is cached.
     useEffect(() => {
         if (searchQuery.trim()) {
             const debounceTimer = setTimeout(() => {
@@ -37,7 +37,7 @@ const Header = () => {
         }
     }, [searchQuery]);
 
-    // Close the suggestions dropdown when the user clicks anywhere outside the search container
+    // Close the suggestions dropdown when clicking outside the search container
     useEffect(() => {
         const handleClickOutside = (e) => {
             if (searchRef.current && !searchRef.current.contains(e.target)) {
@@ -60,23 +60,36 @@ const Header = () => {
         }
     }
 
-    const handleSuggestionClick = (suggestion) => {
-        setSearchQuery(suggestion);
+    // Navigate to the results page for a query (from Enter, the search button, or a suggestion)
+    const runSearch = (q) => {
+        const query = (q ?? searchQuery).trim();
+        if (!query) return;
+        setSearchQuery(query);
         setShowSuggestions(false);
+        navigate(`/results?search_query=${encodeURIComponent(query)}`);
+    };
+
+    const handleSubmit = (e) => {
+        e.preventDefault();
+        runSearch();
+    };
+
+    const handleSuggestionClick = (suggestion) => {
+        runSearch(suggestion);
     };
 
     return (
-        <div className="flex items-center justify-between px-4 py-2 shadow-md sticky top-0 bg-white z-50">
-            <div className="flex items-center gap-4">
+        <div className="flex items-center justify-between gap-2 px-3 sm:px-4 py-2 shadow-md sticky top-0 bg-white z-50">
+            <div className="flex items-center gap-2 sm:gap-4 shrink-0">
                 <button className="p-2 hover:bg-gray-100 rounded-full cursor-pointer" onClick={() => HandleSideBarMenu()}>
                     <img className="w-6" src={SIDE_MENU_BAR} alt="side-menu" />
                 </button>
                 <Link to="/" className="flex items-center gap-1">
                     <img className="w-8" src={YOUTUBE_LOGO} alt="youtube" />
-                    <span className="text-xl font-semibold tracking-tight">YouTube</span>
+                    <span className="hidden sm:inline text-xl font-semibold tracking-tight">YouTube</span>
                 </Link>
             </div>
-            <div className="relative flex items-center w-1/2" ref={searchRef}>
+            <form className="relative flex items-center flex-1 max-w-2xl mx-2" ref={searchRef} onSubmit={handleSubmit}>
                 <input
                     className="w-full px-4 py-2 border border-gray-300 rounded-l-full outline-none focus:border-blue-500"
                     type="text"
@@ -85,7 +98,7 @@ const Header = () => {
                     onChange={(e) => setSearchQuery(e.target.value)}
                     onFocus={() => setShowSuggestions(true)}
                 />
-                <button className="px-5 py-2 bg-gray-100 border border-l-0 border-gray-300 rounded-r-full hover:bg-gray-200 cursor-pointer">
+                <button type="submit" className="px-5 py-2 bg-gray-100 border border-l-0 border-gray-300 rounded-r-full hover:bg-gray-200 cursor-pointer">
                     🔍
                 </button>
                 {/* Google Suggest returns [query, [suggestions]]; index [1] holds the actual list */}
@@ -105,8 +118,8 @@ const Header = () => {
                         ))}
                     </div>
                 )}
-            </div>
-            <div>
+            </form>
+            <div className="shrink-0">
                 <img className="w-8 h-8 rounded-full cursor-pointer" src={USER_ICON} alt="user-icon" />
             </div>
         </div>

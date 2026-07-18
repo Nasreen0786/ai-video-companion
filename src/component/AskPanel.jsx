@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from "react";
+import { useTranscript } from "../utils/useTranscript";
 
 const SUGGESTIONS = [
   {
@@ -25,6 +26,7 @@ export default function AskPanel({ videoId }) {
   const [transcript, setTranscript] = useState(null); // [{ start, end, text }]
   const [tLoading, setTLoading] = useState(false);
   const [tErr, setTErr] = useState("");
+  const getSegments = useTranscript();
 
   // auto-scroll the chat to the newest message
   const bottomRef = useRef(null);
@@ -39,10 +41,11 @@ export default function AskPanel({ videoId }) {
     setQuestion("");
     setChat((c) => [...c, { q, a: null }]);
     try {
+      const segments = await getSegments(videoId);
       const res = await fetch("/api/ask", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ videoId, question: q }),
+        body: JSON.stringify({ videoId, question: q, segments }),
       });
       const json = await res.json();
       const ok = res.ok && !json.error;
@@ -62,16 +65,14 @@ export default function AskPanel({ videoId }) {
     setTLoading(true);
     setTErr("");
     try {
-      const res = await fetch("/api/transcript", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ videoId }),
-      });
-      const json = await res.json();
-      if (!res.ok || json.error) setTErr(json.error || "Couldn't load transcript.");
-      else setTranscript(json.lines || []);
-    } catch {
-      setTErr("Couldn't load the transcript for this video.");
+      const segments = await getSegments(videoId);
+      const fmt = (ms) => {
+        const s = Math.floor((ms || 0) / 1000);
+        return `${Math.floor(s / 60)}:${String(s % 60).padStart(2, "0")}`;
+      };
+      setTranscript(segments.map((s) => ({ start: fmt(s.offset), end: fmt(s.offset + s.duration), text: s.text })));
+    } catch (e) {
+      setTErr(e.message || "Couldn't load the transcript for this video.");
     }
     setTLoading(false);
   }

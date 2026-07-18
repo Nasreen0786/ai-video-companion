@@ -19,7 +19,7 @@ export default async function handler(req, res) {
       end: fmt(s.offset + s.duration),
       text: s.text,
     }));
-    return res.status(200).json({ lines });
+    return res.status(200).json({ lines, segments });
   } catch (e) {
     return res.status(500).json({ error: e.message });
   }

@@ -9,7 +9,7 @@ export default async function handler(req, res) {
 
   try {
     // transcript — works WITHOUT any API key
-    const segments = await fetchTranscript(videoId);
+    const segments = Array.isArray(req.body?.segments) && req.body.segments.length ? req.body.segments : await fetchTranscript(videoId);
     const transcript = segments
       .map((s) => {
         const totalSeconds = Math.floor(Number(s.offset || 0) / 1000);
