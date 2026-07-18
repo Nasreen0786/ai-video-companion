@@ -1,4 +1,4 @@
-import { YoutubeTranscript } from "youtube-transcript";
+import { fetchTranscript } from "../lib/transcript.mjs";
 
 // POST /api/summarize  { videoId }  ->  { summary, chapters, keyPoints }
 // Mock-first: works with NO OpenAI key. Add OPENAI_API_KEY -> real AI turns on automatically.
@@ -9,7 +9,7 @@ export default async function handler(req, res) {
 
   try {
     // 1) transcript — works WITHOUT any API key
-    const segments = await YoutubeTranscript.fetchTranscript(videoId);
+    const segments = await fetchTranscript(videoId);
     const transcript = segments.map((s) => s.text).join(" ").slice(0, 40000);
 
     // 2) NO key yet -> return a MOCK so the whole app works today
