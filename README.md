@@ -5,6 +5,10 @@
 **🔗 Live demo:** https://namaste-youtube-xi.vercel.app
 **Built for:** OpenAI × NamasteDev **Codex** Hackathon · **Team Techbytechronicles**
 
+<p align="center">
+  <img src="docs/screenshots/hero.png" alt="AI Video Companion — summarize, take notes on, and chat with any YouTube video" width="100%">
+</p>
+
 ---
 
 ## Overview
@@ -33,6 +37,25 @@ This project is two things in one:
 - **Live chat** — a simulated live-chat panel (auto-messages via `setInterval`) where you can also post your own messages.
 - **Recursive nested comments** — arbitrarily deep reply trees via a self-referencing component.
 - **404 fallback** for unmatched routes.
+
+---
+
+## 📸 Screenshots
+
+<table>
+<tr>
+<td width="50%"><b>⚡ AI Summary — TL;DR, chapters &amp; key points</b><br><img src="docs/screenshots/04_summary.png" alt="AI Summary with TL;DR, timestamped chapters and key points"></td>
+<td width="50%"><b>💬 Ask — grounded in the real transcript</b><br><img src="docs/screenshots/05_transcript.png" alt="Ask the video, with the timestamped transcript open"></td>
+</tr>
+<tr>
+<td><b>📝 Downloadable Study Notes (Markdown)</b><br><img src="docs/screenshots/06_notes.png" alt="AI-generated study notes, copy or download as .md"></td>
+<td><b>📺 Trending feed (YouTube Data API)</b><br><img src="docs/screenshots/01_home.png" alt="Home feed with real trending videos"></td>
+</tr>
+<tr>
+<td><b>🔎 Search results</b><br><img src="docs/screenshots/02_search.png" alt="Search results page"></td>
+<td><b>▶️ Watch page (video + AI + live chat)</b><br><img src="docs/screenshots/03_watch.png" alt="Watch page layout"></td>
+</tr>
+</table>
 
 ---
 
